@@ -12,4 +12,4 @@ def nonlinear_isotropic_diffusion(img_obj):
     # return noisy_lena_img
 
 #
-# nonlinear_isotropic_diffusion()
+
