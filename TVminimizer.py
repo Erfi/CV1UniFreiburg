@@ -12,7 +12,7 @@ def minimize_total_variation(img_with_border: np.ndarray, border_width: int) -> 
     p = np.zeros((*img_with_border.shape, 2))
     for i in range(steps):
         grad_u = _calculate_gradient(img_with_border, border_width)
-        _gradient_descent_p(p, grad_u, border_width, sigma, alpha)
+        _gradient_ascent_p(p, grad_u, border_width, sigma, alpha)
         _gradient_descent_u(img, img_with_border, p, border_width, tau)
     return img
 
@@ -33,7 +33,7 @@ def _calculate_gradient(img_with_border: np.ndarray, border_width: int) -> np.nd
 
 
 @njit
-def _gradient_descent_p(p: np.ndarray, grad_u: np.ndarray, border_width: int, sigma: float = 0.25,
+def _gradient_ascent_p(p: np.ndarray, grad_u: np.ndarray, border_width: int, sigma: float = 0.25,
                         alpha: float = 1.0) -> None:
     rows, cols = p.shape[0:2]
     for i in range(border_width, rows - border_width):
