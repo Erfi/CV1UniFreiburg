@@ -20,7 +20,7 @@ class TestMethods(unittest.TestCase):
         img = cv2.imread(self.filename, cv2.IMREAD_GRAYSCALE)
         img_with_border = Loader.load_image_with_mirrored_border(img, border_width)
         diffused = nonlinear_isotropic_diffusion(img_with_border, border_width)
-        cv2.imwrite('../results/diffused_boat.pgm', diffused)
+        cv2.imwrite('../results/diffused_boat.jpg', diffused)
 
 
 if __name__ == "__main__":
