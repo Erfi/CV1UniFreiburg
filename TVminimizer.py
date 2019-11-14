@@ -10,7 +10,7 @@ def minimize_total_variation(img_with_border: np.ndarray, border_width: int) -> 
     tau = 0.9
     theta = 1.0
     energy_hist = []
-    img = np.copy(img_with_border)
+    img = np.zeros(img_with_border.shape)
     rows, cols = img_with_border.shape
     p = np.zeros((rows, cols, 2))
     for i in range(steps):
