@@ -4,7 +4,7 @@ from typing import Tuple
 
 
 def minimize_total_variation(img_with_border: np.ndarray, border_width: int) -> Tuple[np.ndarray, list]:
-    steps = 20
+    steps = 10
     sigma = 0.25
     alpha = 0.5
     tau = 0.9
@@ -14,9 +14,11 @@ def minimize_total_variation(img_with_border: np.ndarray, border_width: int) -> 
     rows, cols = img_with_border.shape
     p = np.zeros((rows, cols, 2))
     for i in range(steps):
-        grad_u = _calculate_gradient(img_with_border, border_width)
-        _gradient_ascent_p(p, grad_u, border_width, sigma, alpha)
-        _gradient_descent_u(img, img_with_border, p, border_width, tau, theta)
+        if i % 2 == 0:
+            print(f'step: {i}')
+        grad_u = _calculate_gradient(img_with_border, border_width, vectorize=True)
+        _gradient_ascent_p(p, grad_u, border_width, sigma, alpha, vectorize=True)
+        _gradient_descent_u(img, img_with_border, p, border_width, tau, theta, vectorize=True)
         energy_hist.append(_calculate_energy(img, img_with_border, grad_u, alpha))
     return img, energy_hist
 
@@ -81,11 +83,11 @@ def _divergence_p(p: np.ndarray, border_width: int, vectorize=True) -> np.ndarra
     if vectorize:
         sobelx = cv2.Scharr(p[:, :, 0], cv2.CV_64F, 1, 0)
         sobely = cv2.Scharr(p[:, :, 1], cv2.CV_64F, 0, 1)
-        div_p = sobelx + sobely
-        return div_p
+        div = sobelx + sobely
+        return div
     else:
         rows, cols = p.shape[0:2]
-        div = np.zeros((rows, cols))
+        div = np.ones((rows, cols))
         for i in range(border_width, rows - border_width):
             for j in range(border_width, cols - border_width):
                 pm1_x = p[i, j - 1, 0]
@@ -95,9 +97,9 @@ def _divergence_p(p: np.ndarray, border_width: int, vectorize=True) -> np.ndarra
                 pp1_y = p[i + 1, j, 1]
                 d_y = (pp1_y - pm1_y) / 2.0
                 div[i, j] = d_x + d_y
-        return div
+        return 25 * div  # it seems like div values must increase to it to work (?)
 
 
 def _calculate_energy(img, img_with_border, grad_u, alpha):
-    energy = (img - img_with_border) ** 2 + (alpha * (np.square(grad_u[:, :, 0]) + np.square(grad_u[:, :, 1])))
-    return energy.sum()
+    energy = (img - img_with_border) ** 2 + (alpha * np.linalg.norm(grad_u, axis=2))
+    return np.sum(energy)

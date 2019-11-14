@@ -17,7 +17,7 @@ class TestMethods(unittest.TestCase):
         img_with_border = Loader.load_image_with_mirrored_border(img, border_width)
         denoised, hist = minimize_total_variation(img_with_border, border_width)
         # --- save denoised image ---
-        cv2.imwrite('../results/tv_boat_fast.jpg', denoised)
+        cv2.imwrite('../results/tv_boat.jpg', denoised)
         # --- save energy plot ---
         fig, ax = plt.subplots(nrows=1, ncols=1)
         ax.plot(hist)
