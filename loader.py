@@ -25,3 +25,5 @@ class Loader:
         result[rows + border_width: rows + 2 * border_width, border_width:cols + border_width] = bottom_border
 
         return result
+
+
