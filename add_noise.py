@@ -6,8 +6,10 @@ Auther: Mehran Ahkami <ahkami.mehran@gmail.com>
 import sys
 import argparse
 import numpy as np
-
+import cv2
 import image_handler
+from numba import njit, cuda
+
 
 
 def add_noise_gaussian(
@@ -101,14 +103,15 @@ def add_impulse_noise(
 
 def add_uniform_noise(image: np.ndarray, percent: float = 0.3) -> np.ndarray:
     """
-    Add Uniform noise to the image. Change pixel values with random generated number
+    Add Uniform noise to the image. Change pixel values
+    with random generated number
 
     Arguments:
         image {np.ndarray} -- original image
-    
+
     Keyword Arguments:
         percent {float} -- percentage of pixels to be changed (default: {0.3})
-    
+
     Returns:
         np.ndarray -- noisy image with uniform noise
     """
@@ -118,6 +121,46 @@ def add_uniform_noise(image: np.ndarray, percent: float = 0.3) -> np.ndarray:
     num_px = np.ceil(percent * image.size)
     coords = [np.random.randint(0, i - 1, int(num_px)) for i in image.shape]
     noisy_image[tuple(coords)] = noise[tuple(coords[:2])]
+    noisy_image = noisy_image.astype(np.uint8)
+
+    return noisy_image
+
+@njit
+def add_box_muller(
+    image: np.ndarray, noise_ratio: float = 25, sigma: float = 1.0, mean: float = 0.0 # NOQA
+) -> np.ndarray:
+    """
+    Add bos Muller noise with noise_ratio multiplier
+
+    Arguments:
+        image {np.ndarray} -- original image
+
+    Keyword Arguments:
+        noise_ratio {float} -- paramater to increase the
+        noise in data (default: {25})
+        sigma {float} -- standard deviation (default: {1.0})
+        mean {float} -- mean (default: {0.0})
+
+    Returns:
+        np.ndarray -- noisy image with box muller noise
+    """
+    row, col = image.shape[:2]
+    noisy_image = np.zeros(image.shape, dtype=np.float64)
+    for i in range(row):
+        for j in range(col):
+            u = np.random.rand()
+            v = np.random.rand()
+            N = np.sqrt(-2 * np.log(u)) * np.cos(2 * np.pi * v)
+            M = np.sqrt(-2 * np.log(u)) * np.sin(2 * np.pi * v)  # NOQA
+            noisy_image[i][j][0] += (
+                noise_ratio * (N * sigma + mean) + image[i][j][0]
+            )
+            noisy_image[i][j][1] += (
+                noise_ratio * (N * sigma + mean) + image[i][j][1]
+            )
+            noisy_image[i][j][2] += (
+                noise_ratio * (N * sigma + mean) + image[i][j][2]
+            )
     noisy_image = noisy_image.astype(np.uint8)
 
     return noisy_image
@@ -140,4 +183,7 @@ if __name__ == "__main__":
     image_handler.show_image(noisy_image, args.window)
     noisy_image = add_uniform_noise(noisy_image)
     image_handler.show_image(noisy_image, args.window)
+    noisy_image = add_box_muller(image=image)
+    image_handler.show_image(noisy_image, args.window)
+    image_handler.save_image(noisy_image)
 
