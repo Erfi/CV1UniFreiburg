@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import cv2
 
 from loader import Loader
-from TVminimizer import minimize_total_variation
+from tvminimizer import minimize_total_variation
 
 
 class TestMethods(unittest.TestCase):
