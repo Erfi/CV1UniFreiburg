@@ -107,10 +107,10 @@ if __name__ == "__main__":
     f = ImageFilter(image_name)
     image = f.image
     for i in range(steps):
-        image = f.nonlinear_diffusion(image,tau,variance)
+        image = f.nonlinear_diffusion(image, tau, variance)
     np.delete(image, 0, 0)
     np.delete(image, -1, 0)
     np.delete(image, 0, 1)
     np.delete(image, -1, 1)
     handler = ImageHandler()
-    handler.save_image(image,name=save_path)
+    handler.save_image(image, name=save_path)

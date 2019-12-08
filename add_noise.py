@@ -11,7 +11,6 @@ import image_handler
 from numba import njit, cuda
 
 
-
 def add_noise_gaussian(
     image: np.ndarray, variance: float = 1.5, mean: float = 50
 ) -> np.ndarray:
@@ -125,9 +124,13 @@ def add_uniform_noise(image: np.ndarray, percent: float = 0.3) -> np.ndarray:
 
     return noisy_image
 
+
 @njit
 def add_box_muller(
-    image: np.ndarray, noise_ratio: float = 25, sigma: float = 1.0, mean: float = 0.0 # NOQA
+    image: np.ndarray,
+    noise_ratio: float = 25,
+    sigma: float = 1.0,
+    mean: float = 0.0,  # NOQA
 ) -> np.ndarray:
     """
     Add bos Muller noise with noise_ratio multiplier
@@ -152,15 +155,9 @@ def add_box_muller(
             v = np.random.rand()
             N = np.sqrt(-2 * np.log(u)) * np.cos(2 * np.pi * v)
             M = np.sqrt(-2 * np.log(u)) * np.sin(2 * np.pi * v)  # NOQA
-            noisy_image[i][j][0] += (
-                noise_ratio * (N * sigma + mean) + image[i][j][0]
-            )
-            noisy_image[i][j][1] += (
-                noise_ratio * (N * sigma + mean) + image[i][j][1]
-            )
-            noisy_image[i][j][2] += (
-                noise_ratio * (N * sigma + mean) + image[i][j][2]
-            )
+            noisy_image[i][j][0] += noise_ratio * (N * sigma + mean) + image[i][j][0]
+            noisy_image[i][j][1] += noise_ratio * (N * sigma + mean) + image[i][j][1]
+            noisy_image[i][j][2] += noise_ratio * (N * sigma + mean) + image[i][j][2]
     noisy_image = noisy_image.astype(np.uint8)
 
     return noisy_image
@@ -186,4 +183,3 @@ if __name__ == "__main__":
     noisy_image = add_box_muller(image=image)
     image_handler.show_image(noisy_image, args.window)
     image_handler.save_image(noisy_image)
-

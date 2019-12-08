@@ -30,20 +30,19 @@ def calcucalte_psnr(noisy_image: np.ndarray, origin_image: np.ndarray) -> float:
     mean_squere_error = 0
     for i in range(row):
         for j in range(col):
-            mean_squere_error += \
-                (
-                    noisy_image[i][j][0] - origin_image[i][j][0]
-                ) ** 2
+            mean_squere_error += (noisy_image[i][j][0] - origin_image[i][j][0]) ** 2
     psnr = 10 * np.log10(row * ((max_orig - min_orig) ** 2) / mean_squere_error)
     return psnr
 
 
 if __name__ == "__main__":
-    
+
     if len(sys.argv) < 3:
         print("Two input is required to compute PSNR, noisy and original picture")
         sys.exit()
-    parser = argparse.ArgumentParser(description="Function to computer PSNR from two images")
+    parser = argparse.ArgumentParser(
+        description="Function to computer PSNR from two images"
+    )
     parser.add_argument("origin", metavar="N", type=str, nargs="+")
     parser.add_argument("noisy", metavar="N", type=str, nargs="+")
     args = parser.parse_args()

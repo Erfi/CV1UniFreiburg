@@ -16,13 +16,13 @@ class ImageHandler:
         img = cv2.imread(image_path, load_type)
         self.orig_shape = img.shape
         if self.border == (0, 0):
-            return img.astype('float')
+            return img.astype("float")
         if img.ndim == 3:
             img_pad = np.pad(img, (self.border, self.border, (0, 0)), mode="edge")
-            return img_pad.astype('float')
+            return img_pad.astype("float")
         if img.ndim == 2:
             img_pad = np.pad(img, (self.border, self.border), "edge")
-            return img_pad.astype('float')
+            return img_pad.astype("float")
         return 0
 
     def get_originalShape(self):
@@ -45,7 +45,6 @@ class ImageHandler:
             except Exception:
                 print("There is an error in saving image")
                 sys.exit()
-
 
     def show_image(self, image: np.ndarray, window_time: int = 2500) -> None:
         cv2.imshow("image", image)
